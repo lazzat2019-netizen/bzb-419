@@ -9,7 +9,7 @@
     {
       "binding": "DB",
       "database_name": "bzb419",
-      "database_id": "REPLACE_WITH_YOUR_D1_DATABASE_ID",
+      "database_id": "c5ba8925-9724-479f-941d-6fd37f505921",
       "migrations_dir": "migrations"
     }
   ],
