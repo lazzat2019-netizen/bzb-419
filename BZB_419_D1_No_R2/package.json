@@ -1,0 +1,12 @@
+{
+  "name": "bzb-419-standalone",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "node assemble.mjs",
+    "test": "npm run build && node test-online.mjs && node test-auth.mjs",
+    "deploy": "npm run build && npx wrangler deploy",
+    "db:migrate": "npx wrangler d1 migrations apply bzb419 --remote"
+  }
+}

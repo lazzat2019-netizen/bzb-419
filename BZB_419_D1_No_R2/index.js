@@ -1,0 +1,3 @@
+import core from './core.js';
+import {authRoute,session} from './auth.js';
+export default {async fetch(req,env,ctx){try{const auth=await authRoute(req,env);if(auth)return auth;const headers=new Headers(req.headers);for(const h of [...headers.keys()])if(h.startsWith('oai-authenticated-'))headers.delete(h);const user=await session(req,env);if(user){headers.set('oai-authenticated-user-id',user.sub);headers.set('oai-authenticated-user-email',user.email)}return await core.fetch(new Request(req,{headers}),env,ctx)}catch{return new Response('Қызмет уақытша қолжетімсіз. Кейін қайта көріңіз.',{status:503,headers:{'content-type':'text/plain;charset=utf-8','cache-control':'no-store'}})}}};

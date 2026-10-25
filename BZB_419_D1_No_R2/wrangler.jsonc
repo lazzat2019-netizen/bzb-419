@@ -1,0 +1,19 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "bzb-419",
+  "main": "index.js",
+  "compatibility_date": "2026-10-25",
+  "workers_dev": true,
+  "build": {
+    "command": "npm run build"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "bzb419",
+      "database_id": "c5ba8925-9724-479f-941d-6fd37f505921",
+      "migrations_dir": ".",
+      "migrations_pattern": "./000*_*.sql"
+    }
+  ]
+}
