@@ -36,6 +36,7 @@ async function api(req,env,url){
  }
  const m=path.match(/^\/api\/teacher\/assignments\/([^/]+)(?:\/(submissions|status))?$/);
  if(m){const a=await env.DB.prepare('SELECT * FROM online_assignments WHERE id=?').bind(m[1]).first();if(!a)fail('Тапсырма табылмады.',404);
+ if(!m[2]&&req.method==='DELETE'){const b=await body(req);if(b.confirm!==a.id)fail('Өшіруді растаңыз.');await env.DB.batch([env.DB.prepare('DELETE FROM online_submissions WHERE assignment_id=?').bind(a.id),env.DB.prepare('DELETE FROM online_assignments WHERE id=?').bind(a.id)]);return j({ok:true})}
  if(m[2]==='status'&&req.method==='POST'){const b=await body(req);if(typeof b.open!=='boolean')fail('Күй жарамсыз.');await env.DB.prepare('UPDATE online_assignments SET open=? WHERE id=?').bind(b.open?1:0,a.id).run();return j({ok:true})}
  if(m[2]==='submissions'&&req.method==='GET'){const rows=await env.DB.prepare('SELECT * FROM online_submissions WHERE assignment_id=? ORDER BY submitted_at DESC').bind(a.id).all();return j(rows.results.map(s=>({...s,answers:JSON.parse(s.answers),scores:JSON.parse(s.scores)})))}
  }
