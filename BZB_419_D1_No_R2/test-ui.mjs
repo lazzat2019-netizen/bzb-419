@@ -18,3 +18,22 @@ run("teacherPreferences.templates=[{id:crypto.randomUUID(),name:'Тест кес
 await run('paperDashboard()');document.querySelector('#batchTitle').value='БЖБ';document.querySelector('#batchGrade').value='9А';document.querySelector('#batchTemplate option[value="'+run('teacherPreferences.templates[0].id')+'"]').selected=true;
 await run("importPhotoBatch(Array.from({length:20},()=>({type:'image/png',size:10})))");assert.equal(run('savedPhotos.length'),20);assert.equal(run('savedPhotos.every(w=>w.criteria[0].score===null)'),true);
 console.log('PASS: 20-photo batch reuses a bank rubric, leaves all marks pending and stores scale snapshots.');
+// Regression: a provider failure retains the key and all teacher inputs.
+ctx.fetch=async(path,opts={})=>{calls.push({path,...opts});if(path==='/api/teacher/gemini/check')return Response.json({ok:true,modelAvailable:true,models:['gemini-flash-latest']});return Response.json({error:'Квота аяқталды'}, {status:429})};
+run('generatorStudio()');
+document.querySelector('#genConsent').checked=true;
+await document.querySelector('#generateFive').onclick();
+assert.equal(document.querySelector('#genKey').value,'test-secret-key');
+assert.equal(document.querySelector('#genTitle').value,'Желі');
+assert.equal(document.querySelector('#genConsent').hasAttribute('checked'),true);
+assert.ok(document.querySelector('#generationStatus').textContent.includes('Квота'));
+assert.equal(document.querySelector('#generateFive').disabled,false);
+document.querySelector('#showGeneratorKey').onclick();assert.equal(document.querySelector('#genKey').type,'text');
+run('generatorStudio()');assert.equal(document.querySelector('#genKey').type,'password');assert.equal(document.querySelector('#genKey').value,'test-secret-key');
+await document.querySelector('#checkGeneratorKey').onclick();assert.ok(document.querySelector('#generatorKeyStatus').textContent.includes('Кілт танылды'));
+assert.ok(!calls.at(-1).body.includes('test-secret-key'));
+assert.ok(![...store.values()].join('').includes('test-secret-key'));
+assert.equal(run("cleanedGeneratorKey('  test-key\\u200B  ')"),'test-key');
+assert.throws(()=>run("cleanedGeneratorKey('https://example.test/key')"));
+document.querySelector('#forgetGeneratorKey').onclick();run('generatorStudio()');assert.equal(document.querySelector('#genKey').value,'');
+console.log('PASS: key retention after quota errors, inline feedback, masked navigation, key check, normalization and explicit forgetting.');
