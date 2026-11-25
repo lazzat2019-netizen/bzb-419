@@ -24,6 +24,7 @@ async function api(req,env,url){
  const a=await env.DB.prepare('SELECT * FROM online_assignments WHERE token=?').bind(studentImage[1]).first();if(!a)fail('Тапсырма табылмады.',404);const d=JSON.parse(a.data);if(!d.variants.some(v=>v.tasks.some(t=>t.image===studentImage[2])))fail('Сурет табылмады.',404);return imageResponse(await images.get('task-images/'+studentImage[2]));
  }
  if(!env.DB)fail('Сервердегі дерекқор әлі қосылмаған.',503);
+ if(path==='/api/teacher/gemini/check'&&req.method==='POST')return j(await checkGeminiConnection(req,await body(req)));
  if(path==='/api/teacher/generate'&&req.method==='POST')return j(await generateFive(req,await body(req)));
  if(path==='/api/teacher/settings'){
  await env.DB.prepare('CREATE TABLE IF NOT EXISTS bzb_teacher_settings (owner TEXT PRIMARY KEY NOT NULL, data TEXT NOT NULL, updated_at TEXT NOT NULL)').run();
